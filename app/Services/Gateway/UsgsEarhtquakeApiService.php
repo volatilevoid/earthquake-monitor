@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Gateway;
 
+use App\Services\DTO\Request\GetForPeriodRequest;
+use App\Services\DTO\Response\GetForPeriodresponse;
 use App\Services\Factory\EarthquakeDtoFactory;
+use App\Services\Factory\Response\GetForPeriodresponseFactory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
@@ -19,26 +22,23 @@ class UsgsEarhtquakeApiService implements EarhtquakeApiServiceInterface
     private PendingRequest $http;
 
     public function __construct(
-        private readonly EarthquakeDtoFactory $earthquakeDtoFactory
+        private readonly GetForPeriodresponseFactory $getForPeriodresponseFactory
     ) {
         $this->http = Http::baseUrl(self::BASE_URL . '/' . self::API_VERSION)->acceptJson();
     }
 
-    public function getForPeriod(\DateTimeImmutable $from, \DateTimeImmutable $to): array
+    public function getForPeriod(GetForPeriodRequest $request): GetForPeriodresponse
     {
         $response = $this->http->get('query', [
             'format' => self::RESPONSE_FORMAT,
-            'starttime' => $from->format(self::DATE_FORMAT),
-            'endtime' => $to->format(self::DATE_FORMAT)
+            'starttime' => $request->from->format(self::DATE_FORMAT),
+            'endtime' => $request->from->format(self::DATE_FORMAT)
         ]);
 
         if ($response->failed()) {
-            return [
-                'success' => false,
-                'message' => 'Unable to fetch earthquake data'
-            ];
+            return new GetForPeriodresponse(false, 'Unable to fetch earthquake data');
         }
 
-        return $response->json();
+        return $this->getForPeriodresponseFactory->fromApiResponse($response->json());
     }
 }

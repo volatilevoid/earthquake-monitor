@@ -8,8 +8,14 @@ use App\Services\DTO\EarthquakeDTO;
 
 class EarthquakeDtoFactory
 {
-    public function fromArray(array $data): EarthquakeDto
+    public function fromArray(array $earthquakeArray): EarthquakeDto
     {
-        return new EarthquakeDto(); // TODO
+        return new EarthquakeDto(
+            $earthquakeArray['id'],
+            $earthquakeArray['properties']['title'],
+            $earthquakeArray['properties']['mag'] ?? 0,
+            $earthquakeArray['properties']['place'],
+            (new \DateTimeImmutable())->setTimestamp($earthquakeArray['properties']['time'])
+        );
     }
 }

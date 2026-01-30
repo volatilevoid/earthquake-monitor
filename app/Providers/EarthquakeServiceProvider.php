@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\Factory\EarthquakeDtoFactory;
+use App\Services\Factory\Response\GetForPeriodresponseFactory;
 use App\Services\Gateway\EarhtquakeApiServiceInterface;
 use App\Services\Gateway\UsgsEarhtquakeApiService;
 use Illuminate\Contracts\Foundation\Application;
@@ -17,7 +17,7 @@ class EarthquakeServiceProvider extends ServiceProvider
     {
         $this->app->singleton(EarhtquakeApiServiceInterface::class, function (Application $app) {
             return new UsgsEarhtquakeApiService(
-                $app->make(EarthquakeDtoFactory::class),
+                $app->make(GetForPeriodresponseFactory::class),
             );
         });
     }
