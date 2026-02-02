@@ -6,15 +6,15 @@ namespace App\Services\DTO;
 
 use App\Services\Helpers\SerializerTrait;
 
-class EarthquakeDTO
+readonly class EarthquakeDTO
 {
     use SerializerTrait;
-    
+
     public function __construct(
-        public readonly string $id,
-        public readonly string $title,
-        public readonly float $magnitude,
-        public readonly string $place,
-        public readonly \DateTimeImmutable $time,
+        public string $id,
+        public string $title,
+        public float $magnitude,
+        public string $place,
+        public \DateTimeImmutable $time,
     ) {}
 }

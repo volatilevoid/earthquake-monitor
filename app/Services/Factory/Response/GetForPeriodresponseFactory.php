@@ -4,10 +4,9 @@ declare (strict_types = 1);
 
 namespace App\Services\Factory\Response;
 
-use App\Services\DTO\EarthquakeDTO;
 use App\Services\DTO\Metadata;
-use App\Services\DTO\Response\GetForPeriodresponse;
 use App\Services\Factory\EarthquakeDtoFactory;
+use App\Services\Gateway\DTO\Response\GetForPeriodResponse;
 
 class GetForPeriodresponseFactory
 {
@@ -15,7 +14,7 @@ class GetForPeriodresponseFactory
         private readonly EarthquakeDtoFactory $earthquakeDtoFactory
     ) {}
 
-    public function fromApiResponse(array $apiResponse, bool $success = true, $message = ''): GetForPeriodresponse
+    public function fromApiResponse(array $apiResponse, bool $success = true, $message = ''): GetForPeriodResponse
     {
         $earthquakes = [];
 
@@ -23,7 +22,7 @@ class GetForPeriodresponseFactory
             $earthquakes[] = $this->earthquakeDtoFactory->fromArray($earthquakeArray);
         }
 
-        return new GetForPeriodresponse(
+        return new GetForPeriodResponse(
             $success,
             $message,
             new Metadata(
