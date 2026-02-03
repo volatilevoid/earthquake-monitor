@@ -29,7 +29,12 @@ class NotifyUsersHandler extends AbstractHandler implements HandlerInterface
             // TODO investigate using queue ?
 
             if (!empty($earthquakesExceedUserThreshold)) {
-                Mail::to($user)->send(new EarthquakeThresholdExceeded($earthquakesExceedUserThreshold));
+                Mail::to($user)->send(
+                    new EarthquakeThresholdExceeded(
+                        $earthquakesExceedUserThreshold,
+                        $user
+                    )
+                );
             }
         }
 
