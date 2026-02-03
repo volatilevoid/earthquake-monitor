@@ -16,7 +16,7 @@ class UsgsEarthquakeApiService implements EarthquakeApiServiceInterface
     private const API_VERSION = '1';
 
     private const RESPONSE_FORMAT = 'geojson';
-    private const DATE_FORMAT = '';
+    private const DATE_FORMAT = \DateTimeInterface::ATOM;
 
     private PendingRequest $http;
 
@@ -28,11 +28,16 @@ class UsgsEarthquakeApiService implements EarthquakeApiServiceInterface
 
     public function getForPeriod(GetForPeriodRequest $request): GetForPeriodResponse
     {
-        $response = $this->http->get('query', [
-            'format' => self::RESPONSE_FORMAT,
-            'starttime' => $request->from->format(self::DATE_FORMAT),
-            'endtime' => $request->from->format(self::DATE_FORMAT)
-        ]);
+        try {
+            $response = $this->http->get('query', [
+                'format' => self::RESPONSE_FORMAT,
+                'starttime' => urlencode($request->from->format(self::DATE_FORMAT)),
+                'endtime' => urlencode($request->from->format(self::DATE_FORMAT))
+            ]);
+        } catch (\Throwable $throwable) {
+            return new GetForPeriodResponse(false, $throwable->getMessage());
+        }
+
 
         if ($response->failed()) {
             return new GetForPeriodResponse(false, 'Unable to fetch earthquake data');
