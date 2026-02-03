@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Mail;
+
+use App\Services\DTO\EarthquakeDTO;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class EarthquakeThresholdExceeded extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    /**
+     * @param EarthquakeDTO[] $earthquakes
+     */
+    public function __construct(
+        public array $earthquakes
+    ) {}
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Earthquake Threshold Exceeded',
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
+    {
+        return new Content(
+            view: 'mail.earthquake-threshold-exceeded',
+        );
+    }
+}

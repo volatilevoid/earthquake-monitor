@@ -4,14 +4,34 @@ declare(strict_types=1);
 
 namespace App\UseCase\ProcessEarthquakeData\Handler;
 
+use App\Mail\EarthquakeThresholdExceeded;
+use App\Models\User;
 use App\UseCase\ProcessEarthquakeData\Request\ProcessEarthquakeDataRequest;
 use App\UseCase\ProcessEarthquakeData\Response\ProcessEarthquakeDataResponse;
+use Illuminate\Support\Facades\Mail;
 
 class NotifyUsersHandler extends AbstractHandler implements HandlerInterface
 {
     public function handle(ProcessEarthquakeDataRequest $request): ProcessEarthquakeDataResponse
     {
-        var_dump($request->getEarthquakes());
+
+        $users = User::with('config')->get();
+
+        foreach ($users as $user) {
+            $earthquakesExceedUserThreshold = [];
+
+            foreach ($request->getEarthquakes() as $earthquakeDTO) {
+                if ($earthquakeDTO->magnitude > $user->config->magnitude) {
+                    $earthquakesExceedUserThreshold[] = $earthquakeDTO;
+                }
+            }
+
+            // TODO investigate using queue ?
+
+            if (!empty($earthquakesExceedUserThreshold)) {
+                Mail::to($user)->send(new EarthquakeThresholdExceeded($earthquakesExceedUserThreshold));
+            }
+        }
 
         return new ProcessEarthquakeDataResponse(
             true,
