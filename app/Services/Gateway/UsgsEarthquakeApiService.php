@@ -40,7 +40,7 @@ class UsgsEarthquakeApiService implements EarthquakeApiServiceInterface
 
 
         if ($response->failed()) {
-            return new GetForPeriodResponse(false, 'Unable to fetch earthquake data');
+            return new GetForPeriodResponse(false, $response->getReasonPhrase());
         }
 
         return $this->getForPeriodresponseFactory->fromApiResponse($response->json());
