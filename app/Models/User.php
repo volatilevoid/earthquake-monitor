@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
+    public const ADMIN_ROLE = 'admin';
+    public const ADMIN_SUPER_ROLE = 'super_admin';
     /**
      * The attributes that are mass assignable.
      *
@@ -48,5 +51,10 @@ class User extends Authenticatable
     public function config(): HasOne
     {
         return $this->hasOne(Config::class);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === self::ADMIN_SUPER_ROLE;
     }
 }
