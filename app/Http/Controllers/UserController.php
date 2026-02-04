@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessEarthquakesJob;
-use App\Mail\EarthquakeThresholdExceeded;
-use App\Mail\TestMail;
+use App\Helper\CacheKeyHelper;
 use App\Models\User;
-use App\UseCase\ProcessEarthquakeData\ProcessEarthquakeDataCommand;
-use App\UseCase\ProcessEarthquakeData\Request\ProcessEarthquakeDataRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -18,7 +14,6 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
-        // TODO error when no token
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|email',
@@ -32,6 +27,8 @@ class UserController extends Controller
             'role' => User::ADMIN_ROLE
         ]);
 
+        Cache::delete(CacheKeyHelper::getAllUsersCacheKey());
+
         return [
             'success' => true,
             'message' => 'User successfully created',
@@ -39,13 +36,25 @@ class UserController extends Controller
         ];
     }
 
-    public function view(Request $request)
+    public function view()
     {
-        return User::all();
+        if (Cache::has(CacheKeyHelper::getAllUsersCacheKey())) {
+            return Cache::get(CacheKeyHelper::getAllUsersCacheKey());
+        }
+
+        $allUsers = User::all();
+
+        Cache::forever(CacheKeyHelper::getAllUsersCacheKey(), $allUsers);
+
+        return ['users' => $allUsers];
     }
 
     public function userDetails(Request $request)
     {
+        if (Cache::has(CacheKeyHelper::getUserCacheKey($request->user()))) {
+            return Cache::get(CacheKeyHelper::getUserCacheKey($request->user()));
+        }
+
         return [
             'success' => true,
             'message' => 'Details successfully retrieved',

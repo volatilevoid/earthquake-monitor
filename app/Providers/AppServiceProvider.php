@@ -5,7 +5,6 @@ namespace App\Providers;
 use App\Jobs\ProcessEarthquakesJob;
 use App\Services\Gateway\EarthquakeApiServiceInterface;
 use App\UseCase\ProcessEarthquakeData\ProcessEarthquakeDataCommand;
-use App\UseCase\ProcessEarthquakeData\Request\ProcessEarthquakeDataRequest;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 

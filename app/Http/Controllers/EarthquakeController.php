@@ -2,17 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\CacheKeyHelper;
 use App\Models\Config;
 use App\Models\Earthquake;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class EarthquakeController extends Controller
 {
     public function getEarthquakes(Request $request)
     {
-
         if ($request->user()->isSuperAdmin()) {
+
+            if (Cache::has(CacheKeyHelper::getEarthquakesCacheKey())) {
+                return Cache::get(CacheKeyHelper::getEarthquakesCacheKey());
+            }
+
             $earthquakes = Earthquake::all();
+
+            Cache::forever(CacheKeyHelper::getEarthquakesCacheKey(), $earthquakes);
 
             return [
                 'success' => true,
@@ -30,7 +38,14 @@ class EarthquakeController extends Controller
             ];
         }
 
+
+        if (Cache::has(CacheKeyHelper::getEarthquakesForUser($request->user()))) {
+            return Cache::get(CacheKeyHelper::getEarthquakesForUser($request->user()));
+        }
+
         $earthquakes = Earthquake::where('magnitude', '>', $config->magnitude_threshold)->get();
+
+        Cache::forever(CacheKeyHelper::getEarthquakesForUser($request->user()), $earthquakes);
 
         return [
             'success' => true,
