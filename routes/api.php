@@ -6,7 +6,8 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/test', [UserController::class, 'test']);
+Route::middleware('throttle:earthquakes-public')
+    ->get('/earthquakes-public', [EarthquakeController::class, 'getEarthquakesPublic']);
 
 
 Route::post('/auth/login', [AuthController::class, 'login']);

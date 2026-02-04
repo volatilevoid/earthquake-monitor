@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Cache;
 
 class EarthquakeController extends Controller
 {
+    public function getEarthquakesPublic(Request $request)
+    {
+        $earthquakes = Earthquake::where('magnitude', '<=', Earthquake::PUBLIC_THRESHOLD_MAX)->get();
+
+        return [
+            'success' => true,
+            'data'  => $earthquakes,
+        ];
+    }
+
     public function getEarthquakes(Request $request)
     {
         if ($request->user()->isSuperAdmin()) {

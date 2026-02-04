@@ -9,5 +9,7 @@ class Earthquake extends Model
 {
     use HasFactory;
 
+    public const PUBLIC_THRESHOLD_MAX = 1.9;
+
     public $timestamps = false;
 }
