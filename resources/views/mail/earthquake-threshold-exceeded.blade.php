@@ -9,13 +9,13 @@
     <h1>Hi {{ $user->name }}</h1>
     <h2>Please check out list of recent earthquakes that have magnitude larger than your set treeshold {{ $user->config->magnitude_threshold }}</h2>
     <table>
-        <tr>
+        <tr style="margin: 25px">
             <th>Magnitude</th>
             <th>Location</th>
             <th>Time</th>
             <th>Url</th>
         </tr>
-        @foreach ($aerthquakes as $earthquake)
+        @foreach ($earthquakes as $earthquake)
             <tr>
                 <td>{{ $earthquake->magnitude }}</td>
                 <td>{{ $earthquake->place }}</td>

@@ -8,6 +8,9 @@ use App\Models\User;
 
 class CacheKeyHelper
 {
+    public const EARTHQUAKES_TAG = 'earthquakes';
+    public const USERS_TAG = 'users';
+
     public static function getAllUsersCacheKey(): string
     {
         return 'all_users';

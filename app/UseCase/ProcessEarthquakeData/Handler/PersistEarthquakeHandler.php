@@ -14,18 +14,39 @@ class PersistEarthquakeHandler extends AbstractHandler implements HandlerInterfa
 {
     public function handle(ProcessEarthquakeDataRequest $request): ProcessEarthquakeDataResponse
     {
+        $haveNewEntries = false;
+        $newEarthQuakesDTOs = [];
+
         foreach ($request->getEarthquakes() as $earthquakeDTO) {
-            Earthquake::factory()->create([
-                'external_id' => $earthquakeDTO->id,
-                'magnitude' => $earthquakeDTO->magnitude,
-                'place' => $earthquakeDTO->place,
-                'occurred_at' => $earthquakeDTO->time
-            ]);
+
+            $isNew = is_null(Earthquake::where('external_id', $earthquakeDTO->id)->first());
+
+            if ($isNew) {
+                Earthquake::factory()->create([
+                    'external_id' => $earthquakeDTO->id,
+                    'magnitude' => $earthquakeDTO->magnitude,
+                    'place' => $earthquakeDTO->place,
+                    'occurred_at' => $earthquakeDTO->time
+                ]);
+
+                $newEarthQuakesDTOs[] = $earthquakeDTO;
+
+                if (!$haveNewEntries) {
+                    $haveNewEntries = true;
+                }
+            }
         }
 
-        Cache::delete(CacheKeyHelper::getEarthquakesCacheKey());
+        if (!$haveNewEntries) {
+            return new ProcessEarthquakeDataResponse(
+                true,
+                'No new earthquake entries fetched',
+            );
+        }
 
-        // TODO use tags to clear all earthquake related cache
+        Cache::tags(CacheKeyHelper::EARTHQUAKES_TAG)->flush();
+
+        $request->setEarthquakes($newEarthQuakesDTOs);
 
         return parent::handle($request);
     }

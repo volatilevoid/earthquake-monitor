@@ -14,13 +14,13 @@ class EarthquakeController extends Controller
     {
         if ($request->user()->isSuperAdmin()) {
 
-            if (Cache::has(CacheKeyHelper::getEarthquakesCacheKey())) {
-                return Cache::get(CacheKeyHelper::getEarthquakesCacheKey());
+            if (Cache::tags(CacheKeyHelper::EARTHQUAKES_TAG)->has(CacheKeyHelper::getEarthquakesCacheKey())) {
+                return Cache::tage(CacheKeyHelper::EARTHQUAKES_TAG)->get(CacheKeyHelper::getEarthquakesCacheKey());
             }
 
             $earthquakes = Earthquake::all();
 
-            Cache::forever(CacheKeyHelper::getEarthquakesCacheKey(), $earthquakes);
+            Cache::tags(CacheKeyHelper::EARTHQUAKES_TAG)->put(CacheKeyHelper::getEarthquakesCacheKey(), $earthquakes);
 
             return [
                 'success' => true,
@@ -28,6 +28,8 @@ class EarthquakeController extends Controller
                 'data' => $earthquakes,
             ];
         }
+
+        $a = Cache::tags('earthquakes')->has('test');
 
         $config = $request->user()->config;
 
@@ -39,13 +41,14 @@ class EarthquakeController extends Controller
         }
 
 
-        if (Cache::has(CacheKeyHelper::getEarthquakesForUser($request->user()))) {
-            return Cache::get(CacheKeyHelper::getEarthquakesForUser($request->user()));
+        if (Cache::tags(CacheKeyHelper::EARTHQUAKES_TAG)->has(CacheKeyHelper::getEarthquakesForUser($request->user()))) {
+            return Cache::tags(CacheKeyHelper::EARTHQUAKES_TAG)->get(CacheKeyHelper::getEarthquakesForUser($request->user()));
         }
 
         $earthquakes = Earthquake::where('magnitude', '>', $config->magnitude_threshold)->get();
 
-        Cache::forever(CacheKeyHelper::getEarthquakesForUser($request->user()), $earthquakes);
+
+        Cache::tags(CacheKeyHelper::EARTHQUAKES_TAG)->put(CacheKeyHelper::getEarthquakesForUser($request->user()), $earthquakes);
 
         return [
             'success' => true,

@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function __construct() {}
-
     public function create(Request $request)
     {
         $request->validate([
@@ -27,7 +25,7 @@ class UserController extends Controller
             'role' => User::ADMIN_ROLE
         ]);
 
-        Cache::delete(CacheKeyHelper::getAllUsersCacheKey());
+        Cache::tags(CacheKeyHelper::USERS_TAG)->flush();
 
         return [
             'success' => true,
@@ -38,13 +36,13 @@ class UserController extends Controller
 
     public function view()
     {
-        if (Cache::has(CacheKeyHelper::getAllUsersCacheKey())) {
-            return Cache::get(CacheKeyHelper::getAllUsersCacheKey());
+        if (Cache::tags(CacheKeyHelper::USERS_TAG)->has(CacheKeyHelper::getAllUsersCacheKey())) {
+            return Cache::tags(CacheKeyHelper::USERS_TAG)->get(CacheKeyHelper::getAllUsersCacheKey());
         }
 
         $allUsers = User::all();
 
-        Cache::forever(CacheKeyHelper::getAllUsersCacheKey(), $allUsers);
+        Cache::tags(CacheKeyHelper::USERS_TAG)->put(CacheKeyHelper::getAllUsersCacheKey(), $allUsers);
 
         return ['users' => $allUsers];
     }

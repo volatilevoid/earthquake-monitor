@@ -2,10 +2,6 @@
 
 namespace App\Providers;
 
-use App\Jobs\ProcessEarthquakesJob;
-use App\Services\Gateway\EarthquakeApiServiceInterface;
-use App\UseCase\ProcessEarthquakeData\ProcessEarthquakeDataCommand;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,8 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->app->bindMethod([ProcessEarthquakesJob::class, 'handle'], function (ProcessEarthquakesJob $job, Application $app) {
-            return $job->handle($app->make(ProcessEarthquakeDataCommand::class), $app->make(EarthquakeApiServiceInterface::class));
-        });
+        //
     }
 }
