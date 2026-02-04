@@ -6,6 +6,7 @@ namespace App\UseCase\ProcessEarthquakeData\Handler;
 
 use App\Helper\CacheKeyHelper;
 use App\Mail\EarthquakeThresholdExceeded;
+use App\Models\Earthquake;
 use App\Models\User;
 use App\UseCase\ProcessEarthquakeData\Request\ProcessEarthquakeDataRequest;
 use App\UseCase\ProcessEarthquakeData\Response\ProcessEarthquakeDataResponse;
@@ -16,14 +17,13 @@ class NotifyUsersHandler extends AbstractHandler implements HandlerInterface
 {
     public function handle(ProcessEarthquakeDataRequest $request): ProcessEarthquakeDataResponse
     {
-
         $users = User::with('config')->get();
 
         foreach ($users as $user) {
             $earthquakesExceedUserThreshold = [];
 
             foreach ($request->getEarthquakes() as $earthquakeDTO) {
-                if ($earthquakeDTO->magnitude > $user->config->magnitude) {
+                if ($user->config()->exists() && $earthquakeDTO->magnitude > $user->config->magnitude) {
                     $earthquakesExceedUserThreshold[] = $earthquakeDTO;
                 }
             }

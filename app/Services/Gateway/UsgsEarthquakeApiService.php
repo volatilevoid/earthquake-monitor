@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Gateway;
 
-use App\Services\Factory\Response\GetForPeriodresponseFactory;
+use App\Services\Factory\Response\GetForPeriodResponseFactory;
 use App\Services\Gateway\DTO\Request\GetForPeriodRequest;
 use App\Services\Gateway\DTO\Response\GetForPeriodResponse;
 use Illuminate\Http\Client\PendingRequest;
@@ -21,19 +21,18 @@ class UsgsEarthquakeApiService implements EarthquakeApiServiceInterface
     private PendingRequest $http;
 
     public function __construct(
-        private readonly GetForPeriodresponseFactory $getForPeriodresponseFactory
+        private readonly GetForPeriodResponseFactory $getForPeriodResponseFactory
     ) {
         $this->http = Http::baseUrl(self::BASE_URL . '/' . self::API_VERSION)->acceptJson();
     }
 
     public function getForPeriod(GetForPeriodRequest $request): GetForPeriodResponse
     {
-        try {
-            $response = $this->http->get('query', [
-                'format' => self::RESPONSE_FORMAT,
-                'starttime' => urlencode($request->from->format(self::DATE_FORMAT)),
-                'endtime' => urlencode($request->from->format(self::DATE_FORMAT))
-            ]);
+        try {;
+            $url = self::BASE_URL . '/' . self::API_VERSION . '/query?format=' . self::RESPONSE_FORMAT . '&starttime=' . \str_replace('+', '%2B', $request->from->format(self::DATE_FORMAT))
+                . '&endtime=' . \str_replace('+', '%2B', $request->to->format(self::DATE_FORMAT));
+
+            $response = Http::get($url);
         } catch (\Throwable $throwable) {
             return new GetForPeriodResponse(false, $throwable->getMessage());
         }
@@ -43,6 +42,8 @@ class UsgsEarthquakeApiService implements EarthquakeApiServiceInterface
             return new GetForPeriodResponse(false, $response->getReasonPhrase());
         }
 
-        return $this->getForPeriodresponseFactory->fromApiResponse($response->json());
+        return $this->getForPeriodResponseFactory->fromApiResponse(
+            \json_decode($response->getBody()->getContents(), true)
+        );
     }
 }
