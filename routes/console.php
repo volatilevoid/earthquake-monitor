@@ -1,8 +1,17 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Models\LastProcessEarthquakesRunLog;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Schedule::command('app:process-earthquakes', [(new \DateTimeImmutable())->getTimestamp()])
+    ->hourly()
+    ->onSuccess(function () {
+        $lastRun = LastProcessEarthquakesRunLog::first();
+
+        if (is_null($lastRun)) {
+            $lastRun = new LastProcessEarthquakesRunLog();
+        }
+
+        $lastRun->finished_at = new \DateTimeImmutable('now');
+        $lastRun->save();
+    });

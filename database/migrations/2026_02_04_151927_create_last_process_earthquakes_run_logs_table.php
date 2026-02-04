@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('earthquakes', function (Blueprint $table) {
+        Schema::create('last_process_earthquakes_run_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('external_id')->unique();
-            $table->float('magnitude');
-            $table->string('place');
-            $table->timestamp('occurred_at');
+            $table->timestamp('finished_at');
         });
     }
 
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('earthquakes');
+        Schema::dropIfExists('last_process_earthquakes_run_logs');
     }
 };
