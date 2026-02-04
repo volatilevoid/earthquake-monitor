@@ -38,9 +38,9 @@ class UserFactory extends Factory
     public function superAdmin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => User::ADMIN_SUPER_ROLE,
+            'name' => env('SUPER_ADMIN_EMAIL', 'some@email.com'),
             'password' => Hash::make(env('SUPER_ADMIN_PASSWORD', 'password')),
-            'role' => 'super_admin',
+            'role' => User::ADMIN_SUPER_ROLE,
         ]);
     }
 }
