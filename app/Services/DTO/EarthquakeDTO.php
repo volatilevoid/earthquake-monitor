@@ -16,5 +16,6 @@ readonly class EarthquakeDTO
         public float $magnitude,
         public string $place,
         public \DateTimeImmutable $time,
+        public string $url
     ) {}
 }

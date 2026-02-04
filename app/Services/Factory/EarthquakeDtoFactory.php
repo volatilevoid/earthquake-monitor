@@ -15,7 +15,8 @@ class EarthquakeDtoFactory
             $earthquakeArray['properties']['title'],
             $earthquakeArray['properties']['mag'] ?? 0,
             $earthquakeArray['properties']['place'],
-            (new \DateTimeImmutable())->setTimestamp((int)($earthquakeArray['properties']['time'] / 1000))
+            (new \DateTimeImmutable())->setTimestamp((int)($earthquakeArray['properties']['time'] / 1000)),
+            $earthquakeArray['properties']['url']
         );
     }
 }
